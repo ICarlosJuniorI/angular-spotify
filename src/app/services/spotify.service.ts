@@ -4,10 +4,14 @@ import { isPlatformBrowser } from '@angular/common';
 import Spotify from 'spotify-web-api-js';
 import { IUser } from '../interfaces/IUser';
 import {
+  SpotifyArtistToArtist,
   SpotifyPlaylistToPlaylist,
   SpotifyUserToUser,
 } from '../common/spotifyHelper';
 import { IPlaylist } from '../interfaces/IPlaylist';
+import { Router } from '@angular/router';
+import { Observable } from 'rxjs';
+import { IArtist } from '../interfaces/IArtist';
 
 @Injectable({
   providedIn: 'root',
@@ -17,6 +21,7 @@ export class SpotifyService {
   user!: IUser;
 
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly router = inject(Router);
 
   constructor() {
     this.spotifyApi = new Spotify();
@@ -52,6 +57,21 @@ export class SpotifyService {
     return playlists.items.map(SpotifyPlaylistToPlaylist);
   }
 
+  getTopArtists(limit: number = 10): Observable<IArtist[]> {
+    return new Observable<IArtist[]>((observer) => {
+      this.spotifyApi
+        .getMyTopArtists({ limit })
+        .then((response) => {
+          const artists = response.items.map(SpotifyArtistToArtist);
+          observer.next(artists);
+          observer.complete();
+        })
+        .catch((error) => {
+          observer.error(error);
+        });
+    });
+  }
+
   getLoginUrl() {
     const authEndpoint = `${SpotifyConfiguration.authEndpoint}?`;
     const clientId = `client_id=${SpotifyConfiguration.clientId}&`;
@@ -79,5 +99,10 @@ export class SpotifyService {
   defineAccessToken(token: string) {
     this.spotifyApi.setAccessToken(token);
     localStorage.setItem('spotifyToken', token);
+  }
+
+  logout() {
+    localStorage.clear();
+    this.router.navigate(['/login']);
   }
 }

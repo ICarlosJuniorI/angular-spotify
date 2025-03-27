@@ -10,16 +10,23 @@ import { MenuButtonComponent } from '../menu-button/menu-button.component';
 import { IPlaylist } from '../../interfaces/IPlaylist';
 import { SpotifyService } from '../../services/spotify.service';
 import { CommonModule } from '@angular/common';
+import { UserFooterComponent } from '../user-footer/user-footer.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-left-panel',
-  imports: [MenuButtonComponent, FontAwesomeModule, CommonModule],
+  imports: [
+    MenuButtonComponent,
+    FontAwesomeModule,
+    CommonModule,
+    UserFooterComponent,
+  ],
   templateUrl: './left-panel.component.html',
   styleUrl: './left-panel.component.scss',
 })
 export class LeftPanelComponent implements OnInit {
-
   private readonly spotifyService = inject(SpotifyService);
+  private readonly router = inject(Router);
 
   selectedMenu: string = 'Home';
   playlists: IPlaylist[] = [];
@@ -36,10 +43,10 @@ export class LeftPanelComponent implements OnInit {
 
   clickButton(button: string) {
     this.selectedMenu = button;
+    this.router.navigateByUrl('player/home');
   }
 
   async getPlaylists() {
     this.playlists = await this.spotifyService.getUserPlaylist();
-    console.log(this.playlists);
   }
 }
