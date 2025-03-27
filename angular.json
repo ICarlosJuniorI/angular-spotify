@@ -26,15 +26,23 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
+              "src/favicon.ico",
+              "src/assets/images",
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "public",
+                "output": "*/assets/images"
               }
             ],
             "styles": [
               "src/styles.scss"
             ],
             "scripts": [],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "./src/assets/styles"
+              ]
+            },
             "server": "src/main.server.ts",
             "prerender": true,
             "ssr": {
@@ -53,6 +61,12 @@
                   "type": "anyComponentStyle",
                   "maximumWarning": "4kB",
                   "maximumError": "8kB"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
                 }
               ],
               "outputHashing": "all"
@@ -90,9 +104,12 @@
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
             "assets": [
+              "src/favicon.ico",
+              "src/assets/images",
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "public",
+                "output": "*/assets/images"
               }
             ],
             "styles": [
