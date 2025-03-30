@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faGuitar,
@@ -12,6 +12,7 @@ import { SpotifyService } from '../../services/spotify.service';
 import { CommonModule } from '@angular/common';
 import { UserFooterComponent } from '../user-footer/user-footer.component';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-left-panel',
@@ -24,12 +25,14 @@ import { Router } from '@angular/router';
   templateUrl: './left-panel.component.html',
   styleUrl: './left-panel.component.scss',
 })
-export class LeftPanelComponent implements OnInit {
+export class LeftPanelComponent implements OnInit, OnDestroy {
   private readonly spotifyService = inject(SpotifyService);
   private readonly router = inject(Router);
 
   selectedMenu: string = 'Home';
   playlists = signal<IPlaylist[]>([]);
+
+  subs: Subscription[] = [];
 
   // Icons
   homeIcon = faHome;
@@ -41,14 +44,20 @@ export class LeftPanelComponent implements OnInit {
     this.getPlaylists();
   }
 
+  ngOnDestroy(): void {
+    this.subs.forEach((sub) => sub.unsubscribe());
+  }
+
   clickButton(button: string) {
     this.selectedMenu = button;
     this.router.navigateByUrl('player/home');
   }
 
   getPlaylists() {
-    this.spotifyService.getUserPlaylist().subscribe((playlists) => {
+    const sub = this.spotifyService.getUserPlaylist().subscribe((playlists) => {
       this.playlists.set(playlists);
     });
+
+    this.subs.push(sub);
   }
 }

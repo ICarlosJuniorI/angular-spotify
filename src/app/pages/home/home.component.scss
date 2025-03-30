@@ -1,8 +1,22 @@
 @use "table.scss";
+@use "variaveis.scss" as *;
 
 :host {
   display: flex;
   justify-content: space-between;
+
+  ::-webkit-scrollbar {
+    width: 7px;
+
+    &-thumb {
+      background-color: rgba($cor-primaria, 0.2);
+      border-radius: 10px;
+    }
+
+    &-track {
+      background: transparent;
+    }
+  }
 
   .my-musics {
     padding: 0 50px;

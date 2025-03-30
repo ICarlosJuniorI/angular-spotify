@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { SpotifyService } from '../../services/spotify.service';
 import { IArtist } from '../../interfaces/IArtist';
 import { newArtist } from '../../common/factories';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-top-artists',
@@ -10,7 +11,6 @@ import { newArtist } from '../../common/factories';
   styleUrl: './top-artists.component.scss',
 })
 export class TopArtistsComponent implements OnInit {
-  // artist: IArtist = newArtist();
   artist = signal<IArtist>(newArtist());
 
   private readonly spotifyService = inject(SpotifyService);
@@ -20,10 +20,18 @@ export class TopArtistsComponent implements OnInit {
   }
 
   getArtists() {
-    this.spotifyService.getTopArtists(1).subscribe((artists: IArtist[]) => {
-      if (artists.length > 0) {
-        this.artist.set(artists[0]);
-      }
-    });
+    this.spotifyService
+      .getTopArtists(1)
+      .pipe(take(1))
+      .subscribe({
+        next: (artists: IArtist[]) => {
+          if (artists && artists.length > 0) {
+            this.artist.set(artists[0]);
+          }
+        },
+        error: (err) => {
+          console.error('Failed to fetch top artists:', err);
+        },
+      });
   }
 }

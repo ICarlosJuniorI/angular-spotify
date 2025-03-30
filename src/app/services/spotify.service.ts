@@ -1,7 +1,9 @@
 import { inject, Injectable, PLATFORM_ID } from '@angular/core';
-import { SpotifyConfiguration } from '../../environments/environment';
+import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
+import { catchError, from, map, Observable } from 'rxjs';
 import Spotify from 'spotify-web-api-js';
+import { SpotifyConfiguration } from '../../environments/environment';
 import { IUser } from '../interfaces/IUser';
 import {
   SpotifyArtistToArtist,
@@ -10,8 +12,6 @@ import {
   SpotifyUserToUser,
 } from '../common/spotifyHelper';
 import { IPlaylist } from '../interfaces/IPlaylist';
-import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
 import { IArtist } from '../interfaces/IArtist';
 import { IMusic } from '../interfaces/IMusic';
 
@@ -52,58 +52,54 @@ export class SpotifyService {
   }
 
   getUserPlaylist(offset = 0, limit = 50): Observable<IPlaylist[]> {
-    return new Observable<IPlaylist[]>((observer) => {
-      this.spotifyApi
-        .getUserPlaylists(this.user.id, {
-          offset,
-          limit,
-        })
-        .then((response) => {
-          const playlists = response.items.map(SpotifyPlaylistToPlaylist);
-          observer.next(playlists);
-          observer.complete();
-        })
-        .catch((error) => {
-          observer.error(error);
-        });
-    });
+    return from(
+      this.spotifyApi.getUserPlaylists(this.user.id, { offset, limit })
+    ).pipe(
+      map((response) => response.items.map(SpotifyPlaylistToPlaylist)),
+      catchError((error) => {
+        throw error;
+      })
+    );
   }
 
   getTopArtists(limit: number = 10): Observable<IArtist[]> {
-    return new Observable<IArtist[]>((observer) => {
-      this.spotifyApi
-        .getMyTopArtists({ limit })
-        .then((response) => {
-          const artists = response.items.map(SpotifyArtistToArtist);
-          observer.next(artists);
-          observer.complete();
-        })
-        .catch((error) => {
-          observer.error(error);
-        });
-    });
+    return from(this.spotifyApi.getMyTopArtists({ limit })).pipe(
+      map((response) => response.items.map(SpotifyArtistToArtist)),
+      catchError((error) => {
+        throw error;
+      })
+    );
   }
 
   getMusics(offset: number = 0, limit: number = 50): Observable<IMusic[]> {
-    return new Observable<IMusic[]>((observer) => {
-      this.spotifyApi
-        .getMySavedTracks({ offset, limit })
-        .then((response) => {
-          const musics = response.items.map((item) =>
-            SpotifyTrackToMusic(item.track)
-          );
-          observer.next(musics);
-          observer.complete();
-        })
-        .catch((error) => {
-          observer.error(error);
-        });
-    });
+    return from(this.spotifyApi.getMySavedTracks({ offset, limit })).pipe(
+      map((response) =>
+        response.items.map((item) => SpotifyTrackToMusic(item.track))
+      ),
+      catchError((error) => {
+        throw error;
+      })
+    );
   }
 
-  playMusic(musicId: string) {
-    this.spotifyApi.queue(musicId);
-    this.spotifyApi.skipToNext();
+  getCurrentMusic(): Observable<IMusic> {
+    return from(this.spotifyApi.getMyCurrentPlayingTrack()).pipe(
+      map((response) => {
+        if (response.item) {
+          return SpotifyTrackToMusic(response.item);
+        }
+        throw new Error('No music is currently playing');
+      }),
+      catchError((error) => {
+        console.error('Error fetching current music:', error);
+        throw error;
+      })
+    );
+  }
+
+  async playMusic(musicId: string) {
+    await this.spotifyApi.queue(musicId);
+    await this.spotifyApi.skipToNext();
   }
 
   getLoginUrl() {

@@ -17,7 +17,11 @@
     </thead>
     <tbody>
       @for(music of musics(); track music.id) {
-      <tr (click)="playMusic(music)" (keyup)="playMusic(music)">
+      <tr
+        (click)="playMusic(music)"
+        (keyup)="playMusic(music)"
+        [class.playing]="music.id === currentMusic.id"
+      >
         <td>
           <fa-icon class="play" [icon]="playIcon"></fa-icon>
         </td>
