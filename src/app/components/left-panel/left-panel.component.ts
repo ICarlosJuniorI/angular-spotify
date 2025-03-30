@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faGuitar,
@@ -29,7 +29,7 @@ export class LeftPanelComponent implements OnInit {
   private readonly router = inject(Router);
 
   selectedMenu: string = 'Home';
-  playlists: IPlaylist[] = [];
+  playlists = signal<IPlaylist[]>([]);
 
   // Icons
   homeIcon = faHome;
@@ -46,7 +46,9 @@ export class LeftPanelComponent implements OnInit {
     this.router.navigateByUrl('player/home');
   }
 
-  async getPlaylists() {
-    this.playlists = await this.spotifyService.getUserPlaylist();
+  getPlaylists() {
+    this.spotifyService.getUserPlaylist().subscribe((playlists) => {
+      this.playlists.set(playlists);
+    });
   }
 }

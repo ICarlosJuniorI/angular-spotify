@@ -6,12 +6,14 @@ import { IUser } from '../interfaces/IUser';
 import {
   SpotifyArtistToArtist,
   SpotifyPlaylistToPlaylist,
+  SpotifyTrackToMusic,
   SpotifyUserToUser,
 } from '../common/spotifyHelper';
 import { IPlaylist } from '../interfaces/IPlaylist';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { IArtist } from '../interfaces/IArtist';
+import { IMusic } from '../interfaces/IMusic';
 
 @Injectable({
   providedIn: 'root',
@@ -49,12 +51,22 @@ export class SpotifyService {
     this.user = SpotifyUserToUser(userInfo);
   }
 
-  async getUserPlaylist(offset = 0, limit = 50): Promise<IPlaylist[]> {
-    const playlists = await this.spotifyApi.getUserPlaylists(this.user.id, {
-      offset,
-      limit,
+  getUserPlaylist(offset = 0, limit = 50): Observable<IPlaylist[]> {
+    return new Observable<IPlaylist[]>((observer) => {
+      this.spotifyApi
+        .getUserPlaylists(this.user.id, {
+          offset,
+          limit,
+        })
+        .then((response) => {
+          const playlists = response.items.map(SpotifyPlaylistToPlaylist);
+          observer.next(playlists);
+          observer.complete();
+        })
+        .catch((error) => {
+          observer.error(error);
+        });
     });
-    return playlists.items.map(SpotifyPlaylistToPlaylist);
   }
 
   getTopArtists(limit: number = 10): Observable<IArtist[]> {
@@ -70,6 +82,28 @@ export class SpotifyService {
           observer.error(error);
         });
     });
+  }
+
+  getMusics(offset: number = 0, limit: number = 50): Observable<IMusic[]> {
+    return new Observable<IMusic[]>((observer) => {
+      this.spotifyApi
+        .getMySavedTracks({ offset, limit })
+        .then((response) => {
+          const musics = response.items.map((item) =>
+            SpotifyTrackToMusic(item.track)
+          );
+          observer.next(musics);
+          observer.complete();
+        })
+        .catch((error) => {
+          observer.error(error);
+        });
+    });
+  }
+
+  playMusic(musicId: string) {
+    this.spotifyApi.queue(musicId);
+    this.spotifyApi.skipToNext();
   }
 
   getLoginUrl() {

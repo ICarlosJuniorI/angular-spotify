@@ -37,7 +37,7 @@
 
     <div class="playlist-scroll">
       <app-menu-button
-        *ngFor="let playlist of playlists"
+        *ngFor="let playlist of playlists()"
         [description]="playlist.name"
         [selected]="selectedMenu === playlist.id"
         (click)="clickButton(playlist.id)"
