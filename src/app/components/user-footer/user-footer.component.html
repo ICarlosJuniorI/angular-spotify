@@ -2,6 +2,7 @@
   <img [src]="user.imageUrl" alt="" />
   <span>{{ user.name }}</span>
   <fa-icon
+    data-testid="logoutButton"
     class="icon"
     [icon]="exitIcon"
     (click)="logout()"

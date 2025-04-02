@@ -1,8 +1,9 @@
 <button
+  data-testid="button"
   type="button"
   [ngClass]="{ selecionado: selected() }"
   (click)="onClick()"
 >
   <ng-content></ng-content>
-  <span>{{ description() }}</span>
+  <span data-testid="spanDescription">{{ description() }}</span>
 </button>
