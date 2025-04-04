@@ -1,11 +1,6 @@
-<div class="card p-20">
-  <div class="artist flex">
-    <span class="title-bg">
-      {{ artist().name }}
-    </span>
-  </div>
-  <div
-    class="image"
-    [style.background-image]="'url(' + artist().imageUrl + ')'"
-  ></div>
-</div>
+<span class="title-md">Top 5 Artistas</span>
+@for(artist of artists(); track artist.id) {
+<app-artist-item-image class="d-block mt-1" [imageSrc]="artist.imageUrl">{{
+  artist.name
+}}</app-artist-item-image>
+}

@@ -1,0 +1,38 @@
+<div class="container card p-10">
+  <div
+    class="image"
+    [style.background-image]="'url(' + music().album.imageUrl + ')'"
+  ></div>
+  <div class="controls">
+    <span data-testId="spanTitle">{{ music().title }}</span>
+    <div class="buttons">
+      <fa-icon
+        data-testId="previous"
+        [icon]="previousIcon"
+        (click)="skipToPrevious()"
+        (keyup)="skipToPrevious()"
+      ></fa-icon>
+      @if (this.music().isPlaying) {
+      <fa-icon
+        data-testId="pause"
+        [icon]="pauseIcon"
+        (click)="pause()"
+        (keyup)="pause()"
+      ></fa-icon>
+      } @else {
+      <fa-icon
+        data-testId="play"
+        [icon]="playIcon"
+        (click)="play()"
+        (keyup)="play()"
+      ></fa-icon>
+      }
+      <fa-icon
+        data-testId="next"
+        [icon]="nextIcon"
+        (click)="skipToNext()"
+        (keyup)="skipToNext()"
+      ></fa-icon>
+    </div>
+  </div>
+</div>

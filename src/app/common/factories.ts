@@ -25,5 +25,6 @@ export function newMusic(): IMusic {
     ],
     time: '',
     title: '',
+    isPlaying: false,
   };
 }

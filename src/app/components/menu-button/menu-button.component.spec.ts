@@ -31,15 +31,18 @@ describe('MenuButtonComponent', () => {
 
   it('should call onClick on button click', () => {
     const clickEmitSpy = jest.spyOn(component.click, 'emit');
+
     const button = fixture.debugElement.query(By.css('[data-testid="button"]'));
+
     button.triggerEventHandler('click', null);
+
     expect(clickEmitSpy).toHaveBeenCalled();
   });
 
   it('should render description', () => {
     const expectedDescription = 'Test description';
 
-    jest.spyOn(component, 'description');
+    jest.spyOn(component, 'description').mockReturnValue(expectedDescription);
 
     fixture.detectChanges();
 
@@ -47,6 +50,6 @@ describe('MenuButtonComponent', () => {
       By.css('[data-testid="spanDescription"]')
     ).nativeElement;
 
-    expect(spanDescription).toEqual(expectedDescription);
+    expect(spanDescription.textContent).toEqual(expectedDescription);
   });
 });

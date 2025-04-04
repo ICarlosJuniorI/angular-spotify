@@ -38,7 +38,8 @@ export function SpotifyArtistToArtist(
 }
 
 export function SpotifyTrackToMusic(
-  spotifyTrack: SpotifyApi.TrackObjectFull
+  spotifyTrack: SpotifyApi.TrackObjectFull,
+  isPlaying?: boolean
 ): IMusic {
   if (!spotifyTrack) {
     return newMusic();
@@ -64,5 +65,6 @@ export function SpotifyTrackToMusic(
       name: artist.name,
     })),
     time: msToMinutes(spotifyTrack.duration_ms),
+    isPlaying: isPlaying ?? false,
   };
 }

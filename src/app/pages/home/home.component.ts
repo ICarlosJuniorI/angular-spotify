@@ -1,5 +1,5 @@
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
-import { TopArtistsComponent } from '../../components/top-artists/top-artists.component';
+import { TopArtistComponent } from '../../components/top-artist/top-artist.component';
 import { RightPanelComponent } from '../../components/right-panel/right-panel.component';
 import { IMusic } from '../../interfaces/IMusic';
 import { SpotifyService } from '../../services/spotify.service';
@@ -11,7 +11,7 @@ import { Subject, take, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-home',
-  imports: [TopArtistsComponent, RightPanelComponent, FontAwesomeModule],
+  imports: [TopArtistComponent, RightPanelComponent, FontAwesomeModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })

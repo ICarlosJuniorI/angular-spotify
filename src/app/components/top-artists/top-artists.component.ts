@@ -1,37 +1,43 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { ArtistItemImageComponent } from '../artist-item-image/artist-item-image.component';
 import { SpotifyService } from '../../services/spotify.service';
 import { IArtist } from '../../interfaces/IArtist';
-import { newArtist } from '../../common/factories';
-import { take } from 'rxjs';
+import { catchError, of, Subject, takeUntil, tap } from 'rxjs';
 
 @Component({
   selector: 'app-top-artists',
-  imports: [],
+  imports: [ArtistItemImageComponent],
   templateUrl: './top-artists.component.html',
   styleUrl: './top-artists.component.scss',
 })
-export class TopArtistsComponent implements OnInit {
-  artist = signal<IArtist>(newArtist());
-
+export class TopArtistsComponent implements OnInit, OnDestroy {
   private readonly spotifyService = inject(SpotifyService);
+  private readonly destroy$ = new Subject<void>();
+
+  artists = signal<IArtist[]>([]);
 
   ngOnInit(): void {
-    this.getArtists();
+    this.getTopArtists();
   }
 
-  getArtists() {
+  getTopArtists(): void {
     this.spotifyService
-      .getTopArtists(1)
-      .pipe(take(1))
-      .subscribe({
-        next: (artists: IArtist[]) => {
-          if (artists && artists.length > 0) {
-            this.artist.set(artists[0]);
-          }
-        },
-        error: (err) => {
-          console.error('Failed to fetch top artists:', err);
-        },
-      });
+      .getTopArtists(5)
+      .pipe(
+        takeUntil(this.destroy$), // Cancela a assinatura ao destruir o componente
+        tap((response: IArtist[]) => {
+          this.artists.set(response);
+        }),
+        catchError((error) => {
+          console.error('Failed to fetch top artists:', error);
+          return of([]);
+        })
+      )
+      .subscribe();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

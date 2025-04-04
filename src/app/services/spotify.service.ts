@@ -86,7 +86,11 @@ export class SpotifyService {
     return from(this.spotifyApi.getMyCurrentPlayingTrack()).pipe(
       map((response) => {
         if (response.item) {
-          return SpotifyTrackToMusic(response.item);
+          const music = {
+            item: response.item,
+            isPlaying: response.is_playing
+          }
+          return SpotifyTrackToMusic(music.item, music.isPlaying);
         }
         throw new Error('No music is currently playing');
       }),
@@ -100,6 +104,22 @@ export class SpotifyService {
   async playMusic(musicId: string) {
     await this.spotifyApi.queue(musicId);
     await this.spotifyApi.skipToNext();
+  }
+
+  play() {
+    this.spotifyApi.play();
+  }
+
+  pause() {
+    this.spotifyApi.pause();
+  }
+
+  skipToPrevious() {
+    this.spotifyApi.skipToPrevious();
+  }
+
+  skipToNext() {
+    this.spotifyApi.skipToNext();
   }
 
   getLoginUrl() {

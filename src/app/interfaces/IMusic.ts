@@ -8,4 +8,5 @@ export interface IMusic {
     imageUrl: string;
   };
   time: string;
+  isPlaying: boolean;
 }

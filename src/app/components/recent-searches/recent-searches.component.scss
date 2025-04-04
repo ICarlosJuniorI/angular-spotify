@@ -1,0 +1,46 @@
+@use "variaveis.scss" as *;
+
+:host {
+  input {
+    width: 100%;
+    padding: 10px 5px;
+    border-radius: 8px;
+    border-color: $preto-transparente-30;
+    outline: none;
+    color: $cor-primaria;
+    font-size: 1rem;
+    font-weight: 500;
+
+    &::placeholder {
+      color: $preto-transparente-30;
+      font-size: 0.85rem;
+    }
+
+    &:focus,
+    &:active {
+      border-color: $cor-primaria;
+      border-width: 2px;
+    }
+  }
+
+  .sugests {
+    flex-wrap: wrap;
+
+    span {
+      background-color: $branco;
+      margin-right: 5px;
+      padding: 5px 10px;
+      color: $preto-transparente-70;
+      border: 1px solid $preto-transparente-30;
+      border-radius: 20px;
+      margin-top: 10px;
+      font-size: 0.9rem;
+      cursor: pointer;
+
+      &:hover {
+        background-color: rgba($cor-primaria, 0.8);
+        color: $branco;
+      }
+    }
+  }
+}

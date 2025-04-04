@@ -37,4 +37,20 @@ export class PlayerService {
   setCurrentMusic(music: IMusic) {
     this.currentMusic.next(music);
   }
+
+  play() {
+    this.spotifyService.play();
+  }
+
+  pause() {
+    this.spotifyService.pause();
+  }
+
+  skipToPrevious() {
+    this.spotifyService.skipToPrevious();
+  }
+
+  skipToNext() {
+    this.spotifyService.skipToNext();
+  }
 }
