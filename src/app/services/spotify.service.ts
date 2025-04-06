@@ -1,13 +1,14 @@
 import { inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
-import { catchError, from, map, Observable } from 'rxjs';
+import { catchError, from, map, Observable, of, switchMap } from 'rxjs';
 import Spotify from 'spotify-web-api-js';
 import { SpotifyConfiguration } from '../../environments/environment';
 import { IUser } from '../interfaces/IUser';
 import {
   SpotifyArtistToArtist,
   SpotifyPlaylistToPlaylist,
+  SpotifySinglePlaylistToPlaylist,
   SpotifyTrackToMusic,
   SpotifyUserToUser,
 } from '../common/spotifyHelper';
@@ -88,8 +89,8 @@ export class SpotifyService {
         if (response.item) {
           const music = {
             item: response.item,
-            isPlaying: response.is_playing
-          }
+            isPlaying: response.is_playing,
+          };
           return SpotifyTrackToMusic(music.item, music.isPlaying);
         }
         throw new Error('No music is currently playing');
@@ -97,6 +98,46 @@ export class SpotifyService {
       catchError((error) => {
         console.error('Error fetching current music:', error);
         throw error;
+      })
+    );
+  }
+
+  getPlaylistMusics(
+    playlistId: string,
+    offset: number = 0,
+    limit: number = 50
+  ): Observable<IPlaylist | null> {
+    return from(this.spotifyApi.getPlaylist(playlistId)).pipe(
+      map((playlistSpotify) => {
+        if (!playlistSpotify) {
+          return null;
+        }
+
+        const playlist = SpotifySinglePlaylistToPlaylist(playlistSpotify);
+
+        return { playlist, playlistId, offset, limit };
+      }),
+      switchMap((data) => {
+        if (!data) {
+          return of(null);
+        }
+
+        const { playlist, playlistId, offset, limit } = data;
+
+        return from(
+          this.spotifyApi.getPlaylistTracks(playlistId, { offset, limit })
+        ).pipe(
+          map((spotifyMusics) => {
+            playlist.musics = spotifyMusics.items.map((music) =>
+              SpotifyTrackToMusic(music.track as SpotifyApi.TrackObjectFull)
+            );
+            return playlist;
+          })
+        );
+      }),
+      catchError((error) => {
+        console.error('Error fetching playlist musics:', error);
+        return of(null);
       })
     );
   }

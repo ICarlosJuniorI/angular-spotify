@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authenticatedGuard } from './guards/authenticated.guard';
 import { HomeComponent } from './pages/home/home.component';
+import { MusicListComponent } from './pages/music-list/music-list.component';
 
 export const routes: Routes = [
   {
@@ -24,6 +25,10 @@ export const routes: Routes = [
       {
         path: 'home',
         component: HomeComponent,
+      },
+      {
+        path: 'list/:type/:id',
+        component: MusicListComponent,
       },
     ],
   },

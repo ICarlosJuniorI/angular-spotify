@@ -1,9 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { faHome } from '@fortawesome/free-solid-svg-icons';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
-import { faGuitar } from '@fortawesome/free-solid-svg-icons';
-import { faMusic } from '@fortawesome/free-solid-svg-icons';
+import {
+  faHome,
+  faSearch,
+  faGuitar,
+  faMusic,
+} from '@fortawesome/free-solid-svg-icons';
 import { LeftPanelComponent } from './left-panel.component';
 import { SpotifyService } from '../../services/spotify.service';
 import { of, Subscription } from 'rxjs';
@@ -38,7 +40,7 @@ describe('LeftPanelComponent', () => {
   });
 
   it('selectedMenu has a default value', () => {
-    expect(component.selectedMenu).toEqual('Home');
+    expect(component.selectedMenu()).toEqual('Home');
   });
 
   it('subs has a default value', () => {
@@ -70,10 +72,23 @@ describe('LeftPanelComponent', () => {
     component.clickButton(buttonValue);
 
     // Assert: Verify that selectedMenu is updated
-    expect(component.selectedMenu).toBe(buttonValue);
+    expect(component.selectedMenu()).toBe(buttonValue);
 
     // Assert: Verify that navigateByUrl was called with the correct URL
     expect(navigateByUrlSpy).toHaveBeenCalledWith('player/home');
+  });
+
+  it('should navigate to the correct playlist and update selectedMenu', () => {
+    const navigateByUrlSpy = jest.spyOn(component['router'], 'navigateByUrl');
+    const mockPlaylistId = 'playlist123';
+
+    component.goToPlaylist(mockPlaylistId);
+
+    expect(component.selectedMenu()).toBe(mockPlaylistId);
+
+    expect(navigateByUrlSpy).toHaveBeenCalledWith(
+      `player/list/playlist/${mockPlaylistId}`
+    );
   });
 
   describe('ngOnInit', () => {

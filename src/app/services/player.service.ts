@@ -1,37 +1,44 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, OnDestroy } from '@angular/core';
 import { IMusic } from '../interfaces/IMusic';
 import { newMusic } from '../common/factories';
-import { BehaviorSubject } from 'rxjs';
+import {
+  BehaviorSubject,
+  catchError,
+  interval,
+  Subject,
+  switchMap,
+  takeUntil,
+} from 'rxjs';
 import { SpotifyService } from './spotify.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class PlayerService {
+export class PlayerService implements OnDestroy {
   private readonly spotifyService = inject(SpotifyService);
 
   currentMusic = new BehaviorSubject<IMusic>(newMusic());
   timerId: any = null;
 
+  private readonly destroy$ = new Subject<void>();
+
   constructor() {
     this.getCurrentMusic();
   }
 
-  getCurrentMusic() {
-    clearTimeout(this.timerId);
-
-    this.spotifyService.getCurrentMusic().subscribe({
-      next: (music: IMusic) => {
+  private getCurrentMusic() {
+    interval(3000)
+      .pipe(
+        takeUntil(this.destroy$),
+        switchMap(() => this.spotifyService.getCurrentMusic()),
+        catchError((err) => {
+          console.error('Failed to fetch current music:', err);
+          return [];
+        })
+      )
+      .subscribe((music: IMusic) => {
         this.setCurrentMusic(music);
-      },
-      error: (err) => {
-        console.error('Failed to fetch current music:', err);
-      },
-    });
-
-    this.timerId = setInterval(() => {
-      this.getCurrentMusic();
-    }, 3000);
+      });
   }
 
   setCurrentMusic(music: IMusic) {
@@ -52,5 +59,10 @@ export class PlayerService {
 
   skipToNext() {
     this.spotifyService.skipToNext();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next(); // Encerra o fluxo reativo
+    this.destroy$.complete();
   }
 }

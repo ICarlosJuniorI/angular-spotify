@@ -6,7 +6,7 @@
   <div class="menu-container flex opcoes">
     <app-menu-button
       [description]="'Home'"
-      [selected]="selectedMenu === 'Home'"
+      [selected]="selectedMenu() === 'Home'"
       (click)="clickButton('Home')"
       (keyup)="clickButton('Home')"
     >
@@ -15,7 +15,7 @@
 
     <app-menu-button
       [description]="'Pesquisar'"
-      [selected]="selectedMenu === 'Pesquisar'"
+      [selected]="selectedMenu() === 'Pesquisar'"
       (click)="clickButton('Pesquisar')"
       (keyup)="clickButton('Pesquisar')"
     >
@@ -24,7 +24,7 @@
 
     <app-menu-button
       [description]="'Artistas'"
-      [selected]="selectedMenu === 'Artistas'"
+      [selected]="selectedMenu() === 'Artistas'"
       (click)="clickButton('Artistas')"
       (keyup)="clickButton('Artistas')"
     >
@@ -37,11 +37,12 @@
 
     <div class="playlist-scroll">
       <app-menu-button
+        data-testid="menuButton"
         *ngFor="let playlist of playlists()"
         [description]="playlist.name"
-        [selected]="selectedMenu === playlist.id"
-        (click)="clickButton(playlist.id)"
-        (keyup)="clickButton(playlist.id)"
+        [selected]="selectedMenu() === playlist.id"
+        (click)="goToPlaylist(playlist.id)"
+        (keyup)="goToPlaylist(playlist.id)"
       >
         <fa-icon [icon]="playlistIcon"></fa-icon>
       </app-menu-button>

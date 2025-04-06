@@ -29,7 +29,7 @@ export class LeftPanelComponent implements OnInit, OnDestroy {
   private readonly spotifyService = inject(SpotifyService);
   private readonly router = inject(Router);
 
-  selectedMenu: string = 'Home';
+  selectedMenu = signal<string>('Home');
   playlists = signal<IPlaylist[]>([]);
 
   subs: Subscription[] = [];
@@ -49,7 +49,7 @@ export class LeftPanelComponent implements OnInit, OnDestroy {
   }
 
   clickButton(button: string) {
-    this.selectedMenu = button;
+    this.selectedMenu.set(button);
     this.router.navigateByUrl('player/home');
   }
 
@@ -59,5 +59,10 @@ export class LeftPanelComponent implements OnInit, OnDestroy {
     });
 
     this.subs.push(sub);
+  }
+
+  goToPlaylist(playlistId: string) {
+    this.selectedMenu.set(playlistId);
+    this.router.navigateByUrl(`player/list/playlist/${playlistId}`);
   }
 }

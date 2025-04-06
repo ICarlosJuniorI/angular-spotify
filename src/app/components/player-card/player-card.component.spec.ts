@@ -22,7 +22,10 @@ describe('PlayerCardComponent', () => {
     currentMusicSubject = new BehaviorSubject(newMusic());
 
     mockPlayerService = {
+      play: jest.fn(),
+      pause: jest.fn(),
       skipToPrevious: jest.fn(),
+      skipToNext: jest.fn(),
       currentMusic: currentMusicSubject.asObservable(),
     } as unknown as jest.Mocked<PlayerService>;
 
@@ -36,9 +39,9 @@ describe('PlayerCardComponent', () => {
     fixture.detectChanges();
   });
 
-  // it('should create', () => {
-  //   expect(component).toBeTruthy();
-  // });
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
 
   it('should display the music title', () => {
     const music = newMusic();
@@ -98,35 +101,35 @@ describe('PlayerCardComponent', () => {
     expect(component.play).toHaveBeenCalled();
   });
 
-  // describe('ngOnInit', () => {
-  //   it('music has default value', () => {
-  //     expect(component.music()).toEqual(newMusic());
-  //   });
+  describe('ngOnInit', () => {
+    it('music has default value', () => {
+      expect(component.music()).toEqual(newMusic());
+    });
 
-  //   it('previousIcon has default value', () => {
-  //     const icon = faStepBackward;
-  //     expect(component.previousIcon).toEqual(icon);
-  //   });
+    it('previousIcon has default value', () => {
+      const icon = faStepBackward;
+      expect(component.previousIcon).toEqual(icon);
+    });
 
-  //   it('nextIcon has default value', () => {
-  //     const icon = faStepForward;
-  //     expect(component.nextIcon).toEqual(icon);
-  //   });
+    it('nextIcon has default value', () => {
+      const icon = faStepForward;
+      expect(component.nextIcon).toEqual(icon);
+    });
 
-  //   it('playIcon has default value', () => {
-  //     const icon = faPlay;
-  //     expect(component.playIcon).toEqual(icon);
-  //   });
+    it('playIcon has default value', () => {
+      const icon = faPlay;
+      expect(component.playIcon).toEqual(icon);
+    });
 
-  //   it('pauseIcon has default value', () => {
-  //     const icon = faPause;
-  //     expect(component.pauseIcon).toEqual(icon);
-  //   });
+    it('pauseIcon has default value', () => {
+      const icon = faPause;
+      expect(component.pauseIcon).toEqual(icon);
+    });
 
-  //   it('should call getCurrentMusic', () => {
-  //     jest.spyOn(component, 'getCurrentMusic');
-  //     component.ngOnInit();
-  //     expect(component.getCurrentMusic).toHaveBeenCalled();
-  //   });
-  // });
+    it('should call getCurrentMusic', () => {
+      jest.spyOn(component, 'getCurrentMusic');
+      component.ngOnInit();
+      expect(component.getCurrentMusic).toHaveBeenCalled();
+    });
+  });
 });
